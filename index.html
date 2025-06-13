@@ -15,7 +15,6 @@
       min-height: 100vh;
       padding: 20px;
       color: #ffffff;
-
     }
     h1 { margin-bottom: 20px; }
     .stats {
@@ -29,13 +28,14 @@
       justify-content: center;
     }
     .card {
-      width: 60px;
-      height: 60px;
+      width: 80px;
+      height: 80px;
       background-color: #0400ff;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 30px;
+      font-size: 24px;
       border-radius: 12px;
       cursor: pointer;
       user-select: none;
@@ -50,17 +50,33 @@
       height: 100%;
       backface-visibility: hidden;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       border-radius: 12px;
+      padding: 5px;
+      box-sizing: border-box;
     }
     .card .front {
       background-color: #ffffff;
       transform: rotateY(180deg);
-      font-size: 24px;
       color: #000;
     }
-    .card .back { background-color: #0400ff; }
+    .card .front .emoji {
+      font-size: 24px;
+      margin-bottom: 2px;
+    }
+    .card .front .name {
+      font-size: 10px;
+      font-weight: bold;
+      text-align: center;
+      line-height: 1.1;
+    }
+    .card .back { 
+      background-color: #0400ff;
+      font-size: 30px;
+      color: white;
+    }
     button, select {
       margin-top: 20px;
       padding: 10px 20px;
@@ -106,7 +122,42 @@
   <audio id="fail-sound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
 
   <script>
-    const emojis = ['🐶','🐱','🦊','🐭','🐹','🐰','🐸','🐼','🦁','🐯','🐨','🐻','🐷','🐮','🐵','🦄','🐔','🐧','🐢','🐙','🦑','🦞','🐳','🐬','🦋','🐝','🐞','🦕','🦖','🐲','🐉','🦀','🐡'];
+    const animals = [
+      {emoji: '🐶', name: 'Perro'},
+      {emoji: '🐱', name: 'Gato'},
+      {emoji: '🦊', name: 'Zorro'},
+      {emoji: '🐭', name: 'Ratón'},
+      {emoji: '🐹', name: 'Hámster'},
+      {emoji: '🐰', name: 'Conejo'},
+      {emoji: '🐸', name: 'Rana'},
+      {emoji: '🐼', name: 'Panda'},
+      {emoji: '🦁', name: 'León'},
+      {emoji: '🐯', name: 'Tigre'},
+      {emoji: '🐨', name: 'Koala'},
+      {emoji: '🐻', name: 'Oso'},
+      {emoji: '🐷', name: 'Cerdo'},
+      {emoji: '🐮', name: 'Vaca'},
+      {emoji: '🐵', name: 'Mono'},
+      {emoji: '🦄', name: 'Unicornio'},
+      {emoji: '🐔', name: 'Pollo'},
+      {emoji: '🐧', name: 'Pingüino'},
+      {emoji: '🐢', name: 'Tortuga'},
+      {emoji: '🐙', name: 'Pulpo'},
+      {emoji: '🦑', name: 'Calamar'},
+      {emoji: '🦞', name: 'Langosta'},
+      {emoji: '🐳', name: 'Ballena'},
+      {emoji: '🐬', name: 'Delfín'},
+      {emoji: '🦋', name: 'Mariposa'},
+      {emoji: '🐝', name: 'Abeja'},
+      {emoji: '🐞', name: 'Mariquita'},
+      {emoji: '🦕', name: 'Dinosaurio'},
+      {emoji: '🦖', name: 'T-Rex'},
+      {emoji: '🐲', name: 'Dragón'},
+      {emoji: '🐉', name: 'Dragón Chino'},
+      {emoji: '🦀', name: 'Cangrejo'},
+      {emoji: '🐡', name: 'Pez Globo'}
+    ];
+
     let board = document.getElementById('board');
     let movesCounter = document.getElementById('moves');
     let timerDisplay = document.getElementById('timer');
@@ -143,17 +194,20 @@
       }, 1000);
 
       let size = parseInt(document.getElementById('size').value);
-      board.style.gridTemplateColumns = `repeat(${size}, 80px)`;
+      board.style.gridTemplateColumns = `repeat(${size}, 90px)`;
 
       let neededPairs = (size * size) / 2;
-      let selectedEmojis = shuffle([...emojis]).slice(0, neededPairs);
-      let cardsArray = shuffle([...selectedEmojis, ...selectedEmojis]);
+      let selectedAnimals = shuffle([...animals]).slice(0, neededPairs);
+      let cardsArray = shuffle([...selectedAnimals, ...selectedAnimals]);
 
-      cardsArray.forEach(emoji => {
+      cardsArray.forEach(animal => {
         const card = document.createElement('div');
         card.classList.add('card');
         card.innerHTML = `
-          <div class="front">${emoji}</div>
+          <div class="front">
+            <div class="emoji">${animal.emoji}</div>
+            <div class="name">${animal.name}</div>
+          </div>
           <div class="back">?</div>
         `;
         card.addEventListener('click', () => flipCard(card));
@@ -179,7 +233,7 @@
       moves++;
       movesCounter.textContent = moves;
 
-      if (firstCard.querySelector('.front').textContent === secondCard.querySelector('.front').textContent) {
+      if (firstCard.querySelector('.front .name').textContent === secondCard.querySelector('.front .name').textContent) {
         document.getElementById('success-sound').play();
         matchedPairs++;
         if (matchedPairs === (board.children.length / 2)) {
